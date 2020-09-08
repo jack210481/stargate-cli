@@ -2,12 +2,13 @@
   "name": "stargate-cli",
   "version": "1.1.1",
   "description": "create project with stargate",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "test": "echo 'jack-no-test'"
+    "build": "babel src -d lib",
+    "prepublish": "npm run build"
   },
   "bin": {
-    "stargate": "index.js"
+    "stargate": "./lib/index.js"
   },
   "dependencies": {
     "chalk": "^2.4.2",
@@ -19,6 +20,13 @@
     "node-notifier": "^5.4.0",
     "ora": "^3.4.0",
     "shelljs": "^0.8.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6"
   },
   "keywords": [
     "express",
