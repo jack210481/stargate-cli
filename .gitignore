@@ -2,6 +2,7 @@ node_modules/
 design/
 docs/
 dist/
+lib/
 _site/
 *.bak
 mock/salary/vars.js
