@@ -1,7 +1,7 @@
 {
   "name": "stargate-cli",
-  "version": "1.1.1",
-  "description": "create project with stargate",
+  "version": "1.1.2",
+  "description": "create nodejs-express project",
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src -d lib",
