@@ -5,7 +5,7 @@ import ora from 'ora';
 import chalk from 'chalk';
 import symbols from 'log-symbols';
 import notifier from 'node-notifier';
-import clone from '../utils/clone.js';
+import clone from '../utils/clone';
 
 const remote = 'https://gitee.com/jack210481/stargate-template-nodejs.git';
 const branch = 'master';
@@ -16,12 +16,12 @@ const deleteDir = ['.git', 'README.md', '.gitignore'];
 const questions = [{
   type: 'input',
   message: '请输入项目简介:',
-  name: 'description'
+  name: 'description',
 }, {
   type: 'list',
   message: '请选择模板类型:',
   choices: ['express', 'react-native', 'vue', 'react'],
-  name: 'type'
+  name: 'type',
 }];
 
 export default async (name) => {
@@ -46,23 +46,23 @@ export default async (name) => {
   answers.name = name;
   console.log('------------------------');
   console.log(answers);
-  let confirm = await inquirer.prompt([{
+  const confirm = await inquirer.prompt([{
     type: 'confirm',
     message: '确认创建？',
     default: 'Y',
-    name: 'isConfirm'
+    name: 'isConfirm',
   }]);
   if (!confirm.isConfirm) {
-    return false;
+    return;
   }
 
   // 3. 下载模板
-  await clone(`direct:${remote}#${branch}`, name, {clone: true});
+  await clone(`direct:${remote}#${branch}`, name, { clone: true });
 
   // 4. 清理文件
   const pwd = shell.pwd();
-  deleteDir.map(item => {
-    shell.rm('-rf', pwd + `/${name}/${item}`);
+  deleteDir.forEach((item) => {
+    shell.rm('-rf', `${pwd}/${name}/${item}`);
   });
   shell.cd(name);
   // 修整.gitignore mv -f .gitignore.bak .gitignore
@@ -74,7 +74,7 @@ export default async (name) => {
   pkg = JSON.parse(pkg);
   pkg.name = name;
   pkg.description = answers.description;
-  fs.writeFileSync(`${pwd}/${name}/package.json`, JSON.stringify(pkg), {encoding: 'utf8'});
+  fs.writeFileSync(`${pwd}/${name}/package.json`, JSON.stringify(pkg), { encoding: 'utf8' });
   cfgSpinner.succeed(chalk.green('配置信息写入成功！'));
 
   // 6. 安装依赖
@@ -89,7 +89,7 @@ export default async (name) => {
 
   notifier.notify({
     title: 'stargate-cli',
-    message: ' ♪(＾∀＾●)ﾉ 恭喜，项目创建成功！'
+    message: ' ♪(＾∀＾●)ﾉ 恭喜，项目创建成功！',
   });
   shell.exit(1);
 };

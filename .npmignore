@@ -8,6 +8,8 @@ mock/salary/vars.js
 default.vm
 package-lock.json
 .babelrc
+.eslintignore
+.eslintrc.js
 
 # GIT/SVN generated files #
 ###########################
