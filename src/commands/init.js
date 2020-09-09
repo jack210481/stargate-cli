@@ -10,9 +10,16 @@ import clone from '../utils/clone';
 const remote = 'https://gitee.com/jack210481/stargate-template-nodejs.git';
 const branch = 'master';
 
-// 要删除的目录
+/**
+ * 需要删除的目录
+ * @type {string[]}
+ */
 const deleteDir = ['.git', 'README.md', '.gitignore'];
 
+/**
+ * 终端输入询问
+ * @type {({})[]}
+ */
 const questions = [{
   type: 'input',
   message: '请输入项目简介:',
@@ -24,24 +31,29 @@ const questions = [{
   name: 'type',
 }];
 
-export default async (name) => {
-  // 0. 检查控制台是否以运行`git `开头的命令
+/**
+ * 检查git 以及 校验项目名字
+ */
+const predicate = (name) => {
+  // 检查git环境
   if (!shell.which('git')) {
     console.log(symbols.error, '对不起，git命令不可用！');
     shell.exit(1);
   }
-
-  // 1. 验证输入name是否合法
+  // 验证输入name是否合法
   if (fs.existsSync(name)) {
     console.log(symbols.warning, `已存在项目文件夹 ${name}！`);
-    return;
+    shell.exit(1);
   }
   if (name.match(/[^A-Za-z0-9\u4e00-\u9fa5_-]/g)) {
     console.log(symbols.error, '项目名称存在非法字符！');
-    return;
+    shell.exit(1);
   }
+};
 
-  // 2. 询问用户配置
+export default async (name) => {
+  predicate(name);
+  // 询问用户配置
   const answers = await inquirer.prompt(questions);
   answers.name = name;
   console.log('------------------------');
@@ -56,20 +68,20 @@ export default async (name) => {
     return;
   }
 
-  // 3. 下载模板
+  // 获取模板
   await clone(`direct:${remote}#${branch}`, name, { clone: true });
 
-  // 4. 清理文件
+  // 清理文件并初始化.gitignore
   const pwd = shell.pwd();
   deleteDir.forEach((item) => {
     shell.rm('-rf', `${pwd}/${name}/${item}`);
   });
   shell.cd(name);
-  // 修整.gitignore mv -f .gitignore.bak .gitignore
   shell.mv('-f', '.gitignore.bak', '.gitignore');
 
-  // 5. 写入配置文件
-  const cfgSpinner = ora('正在写入配置信息...').start();
+  // 重写package.json
+  const cfgSpinner = ora('正在写入项目配置...')
+    .start();
   let pkg = fs.readFileSync(`${pwd}/${name}/package.json`, 'utf8');
   pkg = JSON.parse(pkg);
   pkg.name = name;
@@ -78,7 +90,8 @@ export default async (name) => {
   cfgSpinner.succeed(chalk.green('配置信息写入成功！'));
 
   // 6. 安装依赖
-  const installSpinner = ora('正在安装依赖...').start();
+  const installSpinner = ora('正在安装依赖...')
+    .start();
   if (shell.exec('npm install --registry https://registry.npm.taobao.org').code !== 0) {
     console.log(symbols.warning, chalk.yellow('自动安装失败，请手动安装！'));
     installSpinner.fail();
@@ -86,7 +99,6 @@ export default async (name) => {
   }
   installSpinner.succeed(chalk.green('依赖安装成功！'));
   console.log(symbols.success, chalk.green('\n       ♪(＾∀＾●)ﾉ \n\n  ❤   恭喜，项目创建成功  ❤ \n'));
-
   notifier.notify({
     title: 'stargate-cli',
     message: ' ♪(＾∀＾●)ﾉ 恭喜，项目创建成功！',
