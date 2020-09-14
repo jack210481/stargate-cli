@@ -103,5 +103,5 @@ export default async (name) => {
     title: 'stargate-cli',
     message: ' ♪(＾∀＾●)ﾉ 恭喜，项目创建成功！',
   });
-  shell.exit(1);
+  shell.exit(0);
 };
